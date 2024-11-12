@@ -24,7 +24,7 @@ python ./train.py
 2. Run the service:
 
 ```bash
-bentoml serve service.py:svc
+bentoml serve
 ```
 
 ## Test the endpoint
