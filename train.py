@@ -12,6 +12,7 @@ import bentoml
 from river import forest
 from river import datasets
 from sklearn.metrics import mean_squared_error
+from mlflow.models import infer_signature
 
 # Custom Python model class to include river model in mlflow
 import mlflow.pyfunc
@@ -67,11 +68,19 @@ def main():
     mse = test_model(trained_arf_model,test_data)
     print(f"Mean Squared Error: {mse}")
 
+    input_example = {
+        "ordinal_date": 736489,
+        "gallup": 37.843213,
+        "ipsos": 38.07067899999999,
+        "morning_consult": 42.318749,
+        "rasmussen": 40.104692,
+        "you_gov": 38.636914000000004
+    }
     # log model in mlflow
     with mlflow.start_run():
         mlflow.log_metric("mse", mse)
         # logging trained model 
-        model_info = mlflow.pyfunc.log_model(artifact_path="model", python_model=trained_arf_model)
+        model_info = mlflow.pyfunc.log_model(artifact_path="model", python_model=trained_arf_model, input_example=input_example)
         # import logged model in Bentoml model store
         bento_model = bentoml.mlflow.import_model('river_arf_model', model_info.model_uri)
         print(f"Model imported to BentoML: {bento_model}")
